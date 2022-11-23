@@ -7,8 +7,6 @@ namespace GenericRepository.Dal
         protected readonly DatabaseContext _context;
 
         public VehicleRepository(DatabaseContext context) : base(context)
-        {
-            _context = context;
-        }
+            => _context = context;
     }
 }

@@ -21,12 +21,11 @@ namespace GenericRepository.Api.Controllers
             _mapper = mapper;
         }
 
-        // GET api/vehicle
         [HttpGet]
         public async Task<IActionResult> Get()
-        => Ok(_mapper.Map<IEnumerable<VehicleDto>>(await _vehicleRepository.AllAsync()));
+            => Ok(_mapper.Map<IEnumerable<VehicleDto>>(await _vehicleRepository.AllAsync()));
 
-        // GET api/vehicle/{id}
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(string id)
         {
@@ -35,7 +34,6 @@ namespace GenericRepository.Api.Controllers
                                         : NotFound("Vehicle doesn't exists");
         }
 
-        // POST api/vehicle
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] VehicleDto vehicle)
         {
@@ -43,12 +41,13 @@ namespace GenericRepository.Api.Controllers
             return Ok(_mapper.Map<VehicleDto>(savedVehicle));
         }
 
-        // PUT api/vehicle/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(string id, [FromBody] VehicleDto vehicle)
         {
             if (id != vehicle.Id)
+            {
                 return BadRequest("Ids don't match");
+            }                
 
             try
             {
@@ -62,7 +61,6 @@ namespace GenericRepository.Api.Controllers
             }
         }
 
-        // DELETE api/vehicle/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {

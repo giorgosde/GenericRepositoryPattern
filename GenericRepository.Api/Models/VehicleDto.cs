@@ -1,4 +1,6 @@
-﻿namespace GenericRepository.Api.Models
+﻿#nullable enable
+
+namespace GenericRepository.Api.Models
 {
     public class VehicleDto
     {

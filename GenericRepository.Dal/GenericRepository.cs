@@ -9,12 +9,10 @@ namespace GenericRepository.Dal
         protected readonly DatabaseContext _context;
 
         public GenericRepository(DatabaseContext context)
-        {
-            _context = context;
-        }
+            => _context = context;
 
         public async Task<IEnumerable<T>> AllAsync()
-        => await _context.Set<T>().ToListAsync();
+            => await _context.Set<T>().ToListAsync();
 
         public async Task<T> CreateAsync(T entity)
         {
@@ -37,7 +35,7 @@ namespace GenericRepository.Dal
         }
 
         public async Task<T> GetByIdAsync(string id)
-        => await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
+            => await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
 
         public async Task<T> UpdateAsync(T entity)
         {

@@ -5,11 +5,10 @@ This repo is meant to be public.
 
 #### Stack and Features:
 - .NET 6
-- Generics, DI, Async
 - Entity Framework (InMemory Database)
 - Automapper
 - XUnit
-- FluentAssertions,
+- FluentAssertions
 - Moq
 
 #### Overview:

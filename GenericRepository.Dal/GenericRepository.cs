@@ -1,50 +1,58 @@
 ﻿using GenericRepository.Dal.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace GenericRepository.Dal
+namespace GenericRepository.Dal;
+
+public interface IGenericRepository<T>
 {
-    public class GenericRepository<T>: IGenericRepository<T> where T: BaseEntity
+    Task<IEnumerable<T>> AllAsync();
+    Task<T> GetByIdAsync(string id);
+    Task<T> CreateAsync(T entity);
+    Task<T> UpdateAsync(T entity);
+    Task<string> DeleteAsync(string id);
+}
+
+public class GenericRepository<T>: IGenericRepository<T> where T: BaseEntity
+{
+
+    protected readonly DatabaseContext _context;
+
+    public GenericRepository(DatabaseContext context)
+        => _context = context;
+
+    public async Task<IEnumerable<T>> AllAsync()
+        => await _context.Set<T>().ToListAsync();
+
+    public async Task<T> CreateAsync(T entity)
     {
+        entity.Id = Guid.NewGuid().ToString();
+        entity.DateUpdated = DateTime.Now;
 
-        protected readonly DatabaseContext _context;
+        await _context.AddAsync(entity);
+        await _context.SaveChangesAsync();
 
-        public GenericRepository(DatabaseContext context)
-            => _context = context;
+        return entity;
+    }
 
-        public async Task<IEnumerable<T>> AllAsync()
-            => await _context.Set<T>().ToListAsync();
+    public async Task<string> DeleteAsync(string id)
+    {
+        var entity = await _context.Set<T>().FindAsync(id);
+        _context.Set<T>().Remove(entity);
+        await _context.SaveChangesAsync();
 
-        public async Task<T> CreateAsync(T entity)
-        {
-            entity.Id = Guid.NewGuid().ToString();
-            entity.DateUpdated = DateTime.Now;
+        return id;
+    }
 
-            await _context.AddAsync(entity);
-            await _context.SaveChangesAsync();
+    public async Task<T> GetByIdAsync(string id)
+        => await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
 
-            return entity;
-        }
+    public async Task<T> UpdateAsync(T entity)
+    {
+        entity.DateUpdated = DateTime.Now;
 
-        public async Task<string> DeleteAsync(string id)
-        {
-            var entity = await _context.Set<T>().FindAsync(id);
-            _context.Set<T>().Remove(entity);
-            await _context.SaveChangesAsync();
+        _context.Set<T>().Update(entity);
+        await _context.SaveChangesAsync();
 
-            return id;
-        }
-
-        public async Task<T> GetByIdAsync(string id)
-            => await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
-
-        public async Task<T> UpdateAsync(T entity)
-        {
-            entity.DateUpdated = DateTime.Now;
-
-            _context.Set<T>().Update(entity);
-            await _context.SaveChangesAsync();
-
-            return entity;
-        }
+        return entity;
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace GenericRepository.Dal.Entities
+﻿namespace GenericRepository.Dal.Entities;
+
+public class BaseEntity
 {
-    public class BaseEntity
-    {
-        public string Id { get; set; }
-        public DateTime DateUpdated { get; set; }
-    }
+    public string Id { get; set; }
+    public DateTime DateUpdated { get; set; }
 }

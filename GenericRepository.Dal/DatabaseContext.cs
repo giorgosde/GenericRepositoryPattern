@@ -1,13 +1,12 @@
 ﻿using GenericRepository.Dal.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace GenericRepository.Dal
+namespace GenericRepository.Dal;
+
+public class DatabaseContext : DbContext
 {
-    public class DatabaseContext : DbContext
+    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
     {
-        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
-        {
-        }
-        public DbSet<Vehicle> Vehicle { get; set; }
     }
+    public DbSet<Vehicle> Vehicle { get; set; }
 }

@@ -5,75 +5,73 @@ using GenericRepository.Dal.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace GenericRepository.Api.Controllers
+namespace GenericRepository.Api.Controllers;
+
+
+[Route("api/[controller]")]
+[ApiController]
+public class VehicleController : ControllerBase
 {
+    private readonly IVehicleRepository _vehicleRepository;
+    private readonly IMapper _mapper;
 
-    [Route("api/[controller]")]
-    [ApiController]
-    public class VehicleController : ControllerBase
+    public VehicleController(IVehicleRepository vehicleRepository, IMapper mapper)
     {
-        private readonly IVehicleRepository _vehicleRepository;
-        private readonly IMapper _mapper;
+        _vehicleRepository = vehicleRepository;
+        _mapper = mapper;
+    }
 
-        public VehicleController(IVehicleRepository vehicleRepository, IMapper mapper)
+    [HttpGet]
+    public async Task<IActionResult> Get()
+        => Ok(_mapper.Map<IEnumerable<VehicleDto>>(await _vehicleRepository.AllAsync()));
+
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(string id)
+    {
+        var foundVehicle = await _vehicleRepository.GetByIdAsync(id);
+        return foundVehicle != null ? Ok(_mapper.Map<VehicleDto>(foundVehicle))
+                                    : NotFound("Vehicle doesn't exists");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Add([FromBody] VehicleDto vehicle)
+    {
+        var savedVehicle = await _vehicleRepository.CreateAsync(_mapper.Map<Vehicle>(vehicle));
+        return Ok(_mapper.Map<VehicleDto>(savedVehicle));
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(string id, [FromBody] VehicleDto vehicle)
+    {
+        if (id != vehicle.Id)
         {
-            _vehicleRepository = vehicleRepository;
-            _mapper = mapper;
+            return BadRequest("Ids don't match");
+        }                
+
+        try
+        {
+            var updatedVehicle = await _vehicleRepository.UpdateAsync(_mapper.Map<Vehicle>(vehicle));
+            return Ok(_mapper.Map<VehicleDto>(updatedVehicle));
         }
-
-        [HttpGet]
-        public async Task<IActionResult> Get()
-            => Ok(_mapper.Map<IEnumerable<VehicleDto>>(await _vehicleRepository.AllAsync()));
-
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
+        catch (Exception e) when (e is ArgumentNullException
+                                  || e is DbUpdateConcurrencyException)
         {
-            var foundVehicle = await _vehicleRepository.GetByIdAsync(id);
-            return foundVehicle != null ? Ok(_mapper.Map<VehicleDto>(foundVehicle))
-                                        : NotFound("Vehicle doesn't exists");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Add([FromBody] VehicleDto vehicle)
-        {
-            var savedVehicle = await _vehicleRepository.CreateAsync(_mapper.Map<Vehicle>(vehicle));
-            return Ok(_mapper.Map<VehicleDto>(savedVehicle));
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] VehicleDto vehicle)
-        {
-            if (id != vehicle.Id)
-            {
-                return BadRequest("Ids don't match");
-            }                
-
-            try
-            {
-                var updatedVehicle = await _vehicleRepository.UpdateAsync(_mapper.Map<Vehicle>(vehicle));
-                return Ok(_mapper.Map<VehicleDto>(updatedVehicle));
-            }
-            catch (Exception e) when (e is ArgumentNullException
-                                      || e is DbUpdateConcurrencyException)
-            {
-                return NotFound("Vehicle doesn't exists");
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
-        {
-            try
-            {
-                return Ok(await _vehicleRepository.DeleteAsync(id));
-            }
-            catch (Exception e) when (e is ArgumentNullException
-                                      || e is DbUpdateConcurrencyException)
-            {
-                return NotFound("Vehicle doesn't exists");
-            }
+            return NotFound("Vehicle doesn't exists");
         }
     }
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        try
+        {
+            return Ok(await _vehicleRepository.DeleteAsync(id));
+        }
+        catch (Exception e) when (e is ArgumentNullException
+                                  || e is DbUpdateConcurrencyException)
+        {
+            return NotFound("Vehicle doesn't exists");
+        }
+    }
 }

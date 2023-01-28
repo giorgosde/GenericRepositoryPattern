@@ -16,3 +16,7 @@ This repo is meant to be public.
 - VehicleRepository inheriting GenericRepository
 - VehicleController CRUD operations
 - Async implementation
+
+#### Docker cheatsheet:
+- docker build -t generic-repo .
+- docker run -p 4000:80 generic-repo
